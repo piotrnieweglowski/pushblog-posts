@@ -6,7 +6,7 @@ description: "Even small sites get scanned by bots. Learn how to protect your pr
 slug: "malicious-bots-found-me-before-google-did"
 tags: ["security", "hackers", "bots", "build-in-public"]
 ---
-## Have you ever wondered if you could get hacked even if your site isn’t popular?
+## Can unpopular sites still get hacked?
 
 I have. And to be honest, I thought that this kind of malicious activity was extremely unlikely in my case.
 
@@ -30,9 +30,12 @@ When I dug deeper into it, it was even more interesting!
     "/.git/logs/head"
 ```
 
-And even something quite fresh like `"/openapi.json"`. I remember that once I bought a domain and provisioned the cloud infrastructure, I noticed in the Cloudflare dashboard that some requests had been made to my page. That was surprising for me, and I had no idea how on Earth somebody could find my page if I hadn't shared that with the world. I hadn’t even published a sitemap file. After seeing those requests I realized what was going on. Bots were trying to steal secrets and take control of my erver or even more interestingly over my cloud account. My server could have been turned into a crypto mining rig while I was sleeping if my server setup had been insecure. 
+And even something quite fresh like `"/openapi.json"`. I remember that once I bought a domain and provisioned the cloud infrastructure, I noticed in the Cloudflare dashboard that some requests had been made to my page. That was surprising for me, and I had no idea how on Earth somebody could find my page if I hadn't shared that with the world. I hadn’t even published a sitemap file. After seeing those requests I realized what was going on. Bots were trying to steal secrets and take control of my erver or even more interestingly over my cloud account. My server could have been turned into a crypto mining rig while I was sleeping if the setup had been insecure. 
 
-## I searched over the Internet to check if that was something ordinary
+Here’s a screenshot from my Cloudflare logs showing some of those suspicious requests:
+![Cloudflare logs](/assets/malicious-bots-found-me-before-google-did/cloudflare.png)
+
+## I checked if this was common
 
 I found many questions on Stack Overflow. The latest I found were asked in 2012: [Suspicious requests in Apache web server log file](https://stackoverflow.com/questions/12454448/suspicious-requests-in-apache-web-server-log-file)
 And in 2015: [Server log file HEAD requests](https://stackoverflow.com/questions/30689682/server-log-file-head-requests). That was a confirmation for me - such requests are normal, just another day in the office. 
@@ -41,15 +44,15 @@ I kept digging into the topic. As you can imagine, malicious actors aren’t idi
 [.env file exposed only when accessing via https and website IP address](https://stackoverflow.com/questions/70687266/env-file-exposed-only-when-accessing-via-https-and-website-ip-address), and
 [Nuxt 3 expose .env file to all](https://stackoverflow.com/questions/75474601/nuxt-3-expose-env-file-to-all).
 
-## If people make mistakes like these, I could have make it too
+## If others make these mistakes, I could too
 
 We're all humans. Humans make mistakes. Period. I asked myself a question if I did everything as it should be, to protect me in case I made a mistake. The setup should ensure that even if I’m having a bad day and not fully focused, nothing bad can happen in this area. I identified areas which need to be secure from a day one.
 
-### .gitignore is your first security layer
+### Use .gitignore as your first defense
 
 You need to have .gitignore, and you should have listed all files containing secrets. This may sound trivial but a few years ago, [Uber had a really severe security incident](https://www.wired.com/story/uber-paid-off-hackers-to-hide-a-57-million-user-data-breach/) because they committed a file with credentials to a private (!!!) github repository. If that happened to such great engineers like them, it's very likely that you or I could run `git add .` and miss an important file in the list of changes. 
 
-### Your second security layer is Docker
+### Use Docker carefully
 
 Similarly to .gitignore you need to have proper setup related to .dockerignore file. No .env or config file should go there. Apart from that, you should avoid copying your entire source code into the Docker image. Just copy the bare minimum needed for the deployment. The last thing is - you should use non-root user:
 
@@ -64,13 +67,13 @@ USER appuser
 CMD ["your_command"]
 ```
 
-### Be aware of your production environment config
+### Secure your production config
 
 To be more secure, you should use environmental variables instead of .env files when building and running the application outside your local environment. 
 
 These days frameworks and web servers are very decent. It’s hard for me to imagine a server exposing its entire file system by default. You need to configure routing in order to be able to serve something. However, it might be one exception from this. A `static` folder with your assets. A lot of servers can allow you to serve the whole content of such a folder. Be careful and keep the content of your assets as lean as possible.
 
-### Do not leak your internal structure via sitemap.xml or robots.txt
+### Don’t expose your internal routes
 
 It happens sometimes that technical files of your infrastructure are created in an automated fashion. I think particularly about two must-have files for every client facing web page: sitemap.xml and robots.txt. If you include every render-able page in your sitemap, that’s a bad idea. The file should help web crawlers to index pages, all you want to insert here are public pages. Revealing internal or admin pages is a bad idea. 
 
@@ -97,17 +100,17 @@ Now you're all set. Two things good to know:
 - The main crawlers like Google respect those hints, but you need to remember that they are just hints and some other actor can ignore it.
 - Your crawling budget will be used for such pages. Not great, not terrible as it was said in one of the great TV series. The most important thing is you didn't reveal your structure to everyone.
 
-### Bonus pro tip: use additional layer of security for those bad guys
+### Bonus: block bots with your CDN
 
 In my case I used Cloudflare workers. I defined exact routes and patterns frequently asked by malicious scanners, and I'm returning **HTTP 404**. As a result, they are blocked, My server doesn't receive any of those requests, and they don't know if I have such a resource they asked. I could return **HTTP 403**, but I would leak my internal structure - I don’t want to give them any clues. Let’s keep it a mystery.
 
-### Your last security layer can be alerting and budget
+### Set up alerts and budget limits
 
 Last point, but very important. You need to have proper alerting and budget in place. If you assume to spend X money for the whole month, and you’ve burned 85% of it in just the first three days of the month? Alert! That should raise a flag. Maybe not red, but definitely orange. Someone is trying to hack you or you misconfigured something. Both of those occasions should be an alert. There is also a third option: your popularity exploded and surprised you - in such case, change your settings and congrats from me, you deserved. 
 
 A budget as some 'circuit breaker' can save you too. Let's imagine that your page is under attack, and you're on holidays not checking an email. Or just sleeping. There could be any number of reasons. That’s just life. Life is unpredictable and you need digital insurance in the form of proper budget configuration.
 
-## Can I be proactive and do my best to make my security better?
+## Can I proactively improve my security?
 
 As it's easy to anticipate the answer - yes, you can. There are plenty of tools which can help you. Please take a look for those two:
 
