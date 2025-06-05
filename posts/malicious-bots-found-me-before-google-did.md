@@ -33,7 +33,7 @@ When I dug deeper into it, it was even more interesting!
 And even something quite fresh like `"/openapi.json"`. I remember that once I bought a domain and provisioned the cloud infrastructure, I noticed in the Cloudflare dashboard that some requests had been made to my page. That was surprising for me, and I had no idea how on Earth somebody could find my page if I hadn't shared that with the world. I hadn’t even published a sitemap file. After seeing those requests I realized what was going on. Bots were trying to steal secrets and take control of my erver or even more interestingly over my cloud account. My server could have been turned into a crypto mining rig while I was sleeping if the setup had been insecure. 
 
 Here’s a screenshot from my Cloudflare logs showing some of those suspicious requests:
-![Cloudflare logs](/assets/malicious-bots-found-me-before-google-did/cloudflare.png)
+![Pic: Cloudflare logs](/assets/malicious-bots-found-me-before-google-did/cloudflare.png)
 
 ## I checked if this was common
 
