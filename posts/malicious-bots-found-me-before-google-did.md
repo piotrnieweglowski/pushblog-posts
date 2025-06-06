@@ -8,7 +8,7 @@ tags: ["security", "hackers", "bots", "build-in-public"]
 ---
 ## Can unpopular sites still get hacked?
 
-I have. And to be honest, I thought that this kind of malicious activity was extremely unlikely in my case.
+To be honest, I thought this kind of malicious activity was extremely unlikely in my case.
 
 I implemented a simple analytics module for PushBlog. Nothing too sophisticated - just counting views grouped by UTM tags. I shipped it to production, and checked the results in a few hours. When I ran a `SELECT *` query in DB I was shocked. I saw a large number of suspicious requests such as 
 ```shell
